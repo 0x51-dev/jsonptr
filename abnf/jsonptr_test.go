@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-func TestRelativeJsonPointer(t *testing.T) {
+func TestJsonPointer(t *testing.T) {
 	for _, test := range []struct {
 		ptr      string
 		expected []string
@@ -44,6 +44,30 @@ func TestRelativeJsonPointer(t *testing.T) {
 			if ptr[i] != v {
 				t.Fatalf("expected %s, got %s", v, ptr[i])
 			}
+		}
+	}
+}
+
+func TestRelativePointer(t *testing.T) {
+	for _, test := range []string{
+		"0",
+		"1/0",
+		"0-1",
+		"2/highly/nested/objects",
+		"0#",
+		"0-1#",
+		"1#",
+	} {
+		p, err := parser.New([]rune(test))
+		if err != nil {
+			t.Fatal(err)
+		}
+		n, err := p.Parse(op.And{abnf.RelativeJsonPointer, op.EOF{}})
+		if err != nil {
+			t.Fatal(test, err)
+		}
+		if _, err := ir.ParseRelativeJsonPointer(n); err != nil {
+			t.Fatal(err)
 		}
 	}
 }

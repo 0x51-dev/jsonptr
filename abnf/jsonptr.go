@@ -10,7 +10,9 @@ var (
 	ReferenceToken      = op.Capture{Name: "ReferenceToken", Value: op.ZeroOrMore{Value: op.Or{Unescaped, Escaped}}}
 	Unescaped           = op.Or{op.RuneRange{Min: 0x00, Max: 0x2E}, op.RuneRange{Min: 0x30, Max: 0x7D}, op.RuneRange{Min: 0x7F, Max: 0xFFFC}, op.RuneRange{Min: 0xFFFE, Max: 0x10FFFF}}
 	Escaped             = op.And{'~', op.Or{'0', '1'}}
-	RelativeJsonPointer = op.Capture{Name: "RelativeJsonPointer", Value: op.And{NonNegativeInteger, op.Or{op.And{op.Optional{Value: IndexManipulation}, JsonPointer}, '#'}}}
-	IndexManipulation   = op.Capture{Name: "IndexManipulation", Value: op.And{op.Or{'+', '-'}, NonNegativeInteger}}
-	NonNegativeInteger  = op.Capture{Name: "NonNegativeInteger", Value: op.Or{rune(0x30), op.And{op.RuneRange{Min: 0x31, Max: 0x39}, op.ZeroOrMore{Value: op.RuneRange{Min: 0x30, Max: 0x39}}}}}
+	RelativeJsonPointer = op.Capture{Name: "RelativeJsonPointer", Value: op.And{OriginSpecification, op.Or{'#', JsonPointer}}}
+	OriginSpecification = op.Capture{Name: "OriginSpecification", Value: op.And{NonNegativeInteger, op.Optional{Value: IndexManipulation}}}
+	IndexManipulation   = op.Capture{Name: "IndexManipulation", Value: op.And{op.Or{'+', '-'}, PositiveInteger}}
+	NonNegativeInteger  = op.Capture{Name: "NonNegativeInteger", Value: op.Or{'0', PositiveInteger}}
+	PositiveInteger     = op.And{op.RuneRange{Min: 0x31, Max: 0x39}, op.ZeroOrMore{Value: op.RuneRange{Min: 0x30, Max: 0x39}}}
 )
